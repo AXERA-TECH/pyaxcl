@@ -6,7 +6,7 @@
 
 ## Overview
 
-**pyAXCL**基于[AXCL](https://axcl-docs.readthedocs.io/zh-cn/latest/) 驱动上实现的python API，支持开发板和M.2算力卡形态。
+**pyAXCL**基于[AXCL](https://axcl-docs.readthedocs.io/zh-cn/latest/) 驱动上实现的  Python API，支持开发板和M.2算力卡形态。
 
 <img src="https://axcl-docs.readthedocs.io/zh-cn/latest/_images/axcl_architecture.svg" style="zoom:80%;" />
 

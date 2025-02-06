@@ -1,15 +1,11 @@
-name: Auto Format Python Code with Black
+name: Release
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  release:
+    types: [created]
 
 jobs:
-  format:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,25 +17,16 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Install dependencies
+      - name: Install build dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install black
+          python -m pip install --upgrade pip setuptools wheel
 
-      - name: Run Black
+      - name: Build the package
         run: |
-          black .
+          python setup.py bdist_wheel
 
-      - name: Check for changes
-        id: check_changes
-        run: |
-          git diff --exit-code || echo "Changes detected"
-
-      - name: Commit changes
-        if: steps.check_changes.outputs.exit_code != 0
-        run: |
-          git config --local user.name "github-actions"
-          git config --local user.email "github-actions@github.com"
-          git add .
-          git commit -m "Format Python code with Black" || echo "No changes to commit"
-          git push
+      - name: Upload the package
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package
+          path: dist/*.whl

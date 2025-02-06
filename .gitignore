@@ -16,6 +16,7 @@ __pycache__/
 
 .Python
 build/
+out/
 wheels/
 share/python-wheels/
 eggs/

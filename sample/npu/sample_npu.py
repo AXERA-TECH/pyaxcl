@@ -45,12 +45,12 @@ def on_release(vnpu, handle, io, ret=1):
         for i in range(input_count):
             phy = io["inputs"][i]["physical_address"]
             if phy != 0:
-                axcl.rt.free(c_void_p(phy))
+                axcl.rt.free(phy)
         output_count = io["output_size"]
         for i in range(output_count):
             phy = io["outputs"][i]["physical_address"]
             if phy != 0:
-                axcl.rt.free(c_void_p(phy))
+                axcl.rt.free(phy)
     if handle is not None:
         axcl.npu.destroy_handle(handle)
     if vnpu is not None:
@@ -148,7 +148,7 @@ def main(vnpu, file, warmup, repeat):
             print(f"engine malloc device memory for input failed, ret = 0x{ret&0xFFFFFFFF:x}")
             phy = 0
         buf = {
-            "physical_address": phy.value,
+            "physical_address": phy,
             "virtual_address": 0,
             "size": size,
             "pStride": None,
@@ -166,7 +166,7 @@ def main(vnpu, file, warmup, repeat):
             print(f"engine malloc device memory for output failed, ret = 0x{ret&0xFFFFFFFF:x}")
             phy = 0
         buf = {
-            "physical_address": phy.value,
+            "physical_address": phy,
             "virtual_address": 0,
             "size": size,
             "pStride": None,

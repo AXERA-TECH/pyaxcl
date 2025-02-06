@@ -52,12 +52,12 @@ def on_release(model_id, info, io, ret=1):
         input_count = engine_get_num_inputs(info)
         for i in range(input_count):
             buf, size, ret = engine_get_input_buffer_by_index(io, i)
-            if 0 == ret and c_void_p(0) != buf:
+            if 0 == ret and 0 != buf:
                 axcl.rt.free(buf)
         output_count = engine_get_num_outputs(info)
         for i in range(output_count):
             buf, size, ret = engine_get_output_buffer_by_index(io, i)
-            if 0 == ret and c_void_p(0) != buf:
+            if 0 == ret and 0 != buf:
                 axcl.rt.free(buf)
     if io is not None:
         engine_destroy_io(io)
@@ -107,16 +107,16 @@ def main(model, vnpu, warmup, repeat):
         dims, _ = engine_get_input_dims(info, 0, i)
         size = engine_get_input_size_by_index(info, 0, i)
         print(
-            f"                [{i}]: name='{name.decode()}', layout={layout_str[layout]}, dtype={dtype_str[dtype]}, dims={dims}, size={size}"
+            f"                [{i}]: name='{name}', layout={layout_str[layout]}, dtype={dtype_str[dtype]}, dims={dims}, size={size}"
         )
         mem, ret = axcl.rt.malloc(size, AXCL_MEM_MALLOC_NORMAL_ONLY)
         if 0 != ret:
-            print(f"axclrt malloc for '{name.decode()}' failed with error code: {ret}")
+            print(f"axclrt malloc for '{name}' failed with error code: {ret}")
             on_release(model_id, info, io)
         ret = engine_set_input_buffer_by_index(io, i, mem, size)
         if 0 != ret:
             print(
-                f"axclrt set io buffer for '{name.decode()}' failed with error code: {ret}"
+                f"axclrt set io buffer for '{name}' failed with error code: {ret}"
             )
 
     print(f"        output:")
@@ -127,16 +127,16 @@ def main(model, vnpu, warmup, repeat):
         dims, _ = engine_get_output_dims(info, 0, i)
         size = engine_get_output_size_by_index(info, 0, i)
         print(
-            f"                [{i}]: name='{name.decode()}', layout={layout_str[layout]}, dtype={dtype_str[dtype]}, dims={dims}, size={size}"
+            f"                [{i}]: name='{name}', layout={layout_str[layout]}, dtype={dtype_str[dtype]}, dims={dims}, size={size}"
         )
         mem, ret = axcl.rt.malloc(size, AXCL_MEM_MALLOC_NORMAL_ONLY)
         if 0 != ret:
-            print(f"axclrt malloc for '{name.decode()}' failed with error code: {ret}")
+            print(f"axclrt malloc for '{name}' failed with error code: {ret}")
             on_release(model_id, info, io)
         ret = engine_set_output_buffer_by_index(io, i, mem, size)
         if 0 != ret:
             print(
-                f"axclrt set io buffer for '{name.decode()}' failed with error code: {ret}"
+                f"axclrt set io buffer for '{name}' failed with error code: {ret}"
             )
 
     ctx, ret = engine_create_context(model_id)

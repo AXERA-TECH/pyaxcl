@@ -16,7 +16,7 @@ rm -rf "pyAXCL.egg-info"
 fi
 
 
-python3 setup.py bdist_wheel --dist-dir ./build
+python3 setup.py bdist_wheel --dist-dir ./out
 
 
 if [ -d "build" ]; then

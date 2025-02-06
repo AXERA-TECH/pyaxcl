@@ -36,9 +36,9 @@ AX_FRAME_TYPE_BUTT = 6
 
 
 AX_AAC_TRANS_TYPE_E = c_int32
-AX_AAC_TRANS_TYPE_UNKNOWN = -1, # Unknown format.
-AX_AAC_TRANS_TYPE_RAW = 0,      # "as is" access units (packet based since there is obviously no sync layer)
-AX_AAC_TRANS_TYPE_ADTS = 2,     # ADTS bitstream format.
+AX_AAC_TRANS_TYPE_UNKNOWN = -1
+AX_AAC_TRANS_TYPE_RAW = 0
+AX_AAC_TRANS_TYPE_ADTS = 2
 AX_AAC_TRANS_TYPE_BUTT = 3
 
 

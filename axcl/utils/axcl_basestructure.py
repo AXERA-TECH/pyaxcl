@@ -54,6 +54,8 @@ class BaseStructure(Structure):
     def get_union_struct(self, u_name, parent):
         union_val = getattr(self, u_name)
         type_field_name = self.name_union_type_mapping.get(u_name)
+        if type_field_name is None:
+            return None, "", ""
 
         type_value = self.get_field_value(type_field_name, parent)
         if type_value is None:

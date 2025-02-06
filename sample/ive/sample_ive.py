@@ -123,9 +123,7 @@ def _filter_test(src_file, dst_path, width, height, frame_type):
         'stride': [width, width, 0],
         'width': width,
         'height': height,
-        'image_type': {
-            'type': frame_type
-        }
+        'type': frame_type
     }
 
     dst = {
@@ -134,9 +132,7 @@ def _filter_test(src_file, dst_path, width, height, frame_type):
         'stride': [width, width, 0],
         'width': width,
         'height': height,
-        'image_type': {
-            'type': frame_type
-        }
+        'type': frame_type
     }
 
     ctrl = {
@@ -195,9 +191,7 @@ def _gmm2_test(src_file, dst_path, width, height, model, frame_type):
         'stride': [width, width, 0],
         'width': width,
         'height': height,
-        'image_type': {
-            'type': frame_type
-        }
+        'type': frame_type
     }
 
     dst_fg = {
@@ -206,9 +200,7 @@ def _gmm2_test(src_file, dst_path, width, height, model, frame_type):
         'stride': [width, width, 0],
         'width': width,
         'height': height,
-        'image_type': {
-            'type': frame_type
-        }
+        'type': frame_type
     }
 
     dst_bg = {
@@ -217,9 +209,7 @@ def _gmm2_test(src_file, dst_path, width, height, model, frame_type):
         'stride': [width, width, 0],
         'width': width,
         'height': height,
-        'image_type': {
-            'type': frame_type
-        }
+        'type': frame_type
     }
 
     model = {
@@ -292,9 +282,7 @@ def _crop_resize_test(src_file, dst_path, width, height, frame_type, engine):
         'stride': [width, width, 0],
         'width': width,
         'height': height,
-        'image_type': {
-            'type' if engine == 0 else 'glb_type': frame_type
-        }
+        'type' if engine == 0 else 'glb_type': frame_type
     }
 
     dst = [
@@ -304,9 +292,7 @@ def _crop_resize_test(src_file, dst_path, width, height, frame_type, engine):
             'stride': [width, width, 0],
             'width': width,
             'height': height,
-            'image_type': {
-                'type' if engine == 0 else 'glb_type': frame_type
-            }
+            'type' if engine == 0 else 'glb_type': frame_type
         }
     ]
 

@@ -102,8 +102,8 @@ def query(handle: int, block: bool) -> tuple[int, int]:
         - **ret** (*int*) - 0 indicates success, otherwise failure.
     """
     ret = -1
-    c_finish = AX_BOOL(0)
     try:
+        c_finish = AX_BOOL(0)
         libaxcl_ive.AXCL_IVE_Query.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Query.argtypes = [
             AX_IVE_HANDLE,
@@ -151,11 +151,12 @@ def dma(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
         - The stride must be 16-byte-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_DATA_T()
-    c_dst = AX_IVE_DST_DATA_T()
-    c_ctrl = AX_IVE_DMA_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_DATA_T()
+        c_dst = AX_IVE_DST_DATA_T()
+        c_ctrl = AX_IVE_DMA_CTRL_T()
+
         libaxcl_ive.AXCL_IVE_DMA.restype = AX_S32
         libaxcl_ive.AXCL_IVE_DMA.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -164,12 +165,13 @@ def dma(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
             POINTER(AX_IVE_DMA_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_data(src, c_src)
-        dict_to_ax_ive_data(dst, c_dst)
-        dict_to_ax_ive_dma_ctrl(ctrl, c_ctrl)
+        c_src.dict2struct(src)
+        c_dst.dict2struct(dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_DMA(byref(c_handle), byref(c_src), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_data_to_dict(c_dst, dst)
+        if ret == 0:
+            dst.update(c_dst.struct2dict())
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -206,12 +208,13 @@ def add(src1: dict, src2: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[i
         - The types, widths, heights of two input sources must be the same.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src1 = AX_IVE_SRC_IMAGE_T()
-    c_src2 = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_ADD_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src1 = AX_IVE_SRC_IMAGE_T()
+        c_src2 = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_ADD_CTRL_T()
+
         libaxcl_ive.AXCL_IVE_Add.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Add.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -221,13 +224,14 @@ def add(src1: dict, src2: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[i
             POINTER(AX_IVE_ADD_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src1, c_src1)
-        dict_to_ax_ive_image(src2, c_src2)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_add_ctrl(ctrl, c_ctrl)
-        c_instant = AX_BOOL(1 if instant else 0)
-        ret = libaxcl_ive.AXCL_IVE_Add(byref(c_handle), byref(c_src1), byref(c_src2), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+
+        dict_to_ive_image(src1, c_src1)
+        dict_to_ive_image(src2, c_src2)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
+        ret = libaxcl_ive.AXCL_IVE_Add(byref(c_handle), byref(c_src1), byref(c_src2), byref(c_dst), byref(c_ctrl), AX_BOOL(instant))
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -264,12 +268,13 @@ def sub(src1: dict, src2: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[i
         - The types, widths, heights of two input sources must be the same.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src1 = AX_IVE_SRC_IMAGE_T()
-    c_src2 = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_SUB_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src1 = AX_IVE_SRC_IMAGE_T()
+        c_src2 = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_SUB_CTRL_T()
+
         libaxcl_ive.AXCL_IVE_Sub.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Sub.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -279,13 +284,14 @@ def sub(src1: dict, src2: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[i
             POINTER(AX_IVE_SUB_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src1, c_src1)
-        dict_to_ax_ive_image(src2, c_src2)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_sub_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src1, c_src1)
+        dict_to_ive_image(src2, c_src2)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_Sub(byref(c_handle), byref(c_src1), byref(c_src2), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -321,11 +327,12 @@ def ive_and(src1: dict, src2: dict, dst: dict, instant: bool) -> tuple[int, int]
         - The types, widths, heights of two input sources must be the same.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src1 = AX_IVE_SRC_IMAGE_T()
-    c_src2 = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src1 = AX_IVE_SRC_IMAGE_T()
+        c_src2 = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+
         libaxcl_ive.AXCL_IVE_And.restype = AX_S32
         libaxcl_ive.AXCL_IVE_And.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -334,12 +341,13 @@ def ive_and(src1: dict, src2: dict, dst: dict, instant: bool) -> tuple[int, int]
             POINTER(AX_IVE_DST_IMAGE_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src1, c_src1)
-        dict_to_ax_ive_image(src2, c_src2)
-        dict_to_ax_ive_image(dst, c_dst)
+        dict_to_ive_image(src1, c_src1)
+        dict_to_ive_image(src2, c_src2)
+        dict_to_ive_image(dst, c_dst)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_And(byref(c_handle), byref(c_src1), byref(c_src2), byref(c_dst), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -375,11 +383,11 @@ def ive_or(src1: dict, src2: dict, dst: dict, instant: bool) -> tuple[int, int]:
         - The types, widths, heights of two input sources must be the same.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src1 = AX_IVE_SRC_IMAGE_T()
-    c_src2 = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src1 = AX_IVE_SRC_IMAGE_T()
+        c_src2 = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
         libaxcl_ive.AXCL_IVE_Or.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Or.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -388,12 +396,13 @@ def ive_or(src1: dict, src2: dict, dst: dict, instant: bool) -> tuple[int, int]:
             POINTER(AX_IVE_DST_IMAGE_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src1, c_src1)
-        dict_to_ax_ive_image(src2, c_src2)
-        dict_to_ax_ive_image(dst, c_dst)
+        dict_to_ive_image(src1, c_src1)
+        dict_to_ive_image(src2, c_src2)
+        dict_to_ive_image(dst, c_dst)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_Or(byref(c_handle), byref(c_src1), byref(c_src2), byref(c_dst), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -429,11 +438,11 @@ def xor(src1: dict, src2: dict, dst: dict, instant: bool) -> tuple[int, int]:
         - The types, widths, heights of two input sources must be the same.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src1 = AX_IVE_SRC_IMAGE_T()
-    c_src2 = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src1 = AX_IVE_SRC_IMAGE_T()
+        c_src2 = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
         libaxcl_ive.AXCL_IVE_Xor.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Xor.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -442,12 +451,13 @@ def xor(src1: dict, src2: dict, dst: dict, instant: bool) -> tuple[int, int]:
             POINTER(AX_IVE_DST_IMAGE_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src1, c_src1)
-        dict_to_ax_ive_image(src2, c_src2)
-        dict_to_ax_ive_image(dst, c_dst)
+        dict_to_ive_image(src1, c_src1)
+        dict_to_ive_image(src2, c_src2)
+        dict_to_ive_image(dst, c_dst)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_Xor(byref(c_handle), byref(c_src1), byref(c_src2), byref(c_dst), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -484,12 +494,12 @@ def mse(src1: dict, src2: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[i
         - The types, widths, heights of two input sources must be the same.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src1 = AX_IVE_SRC_IMAGE_T()
-    c_src2 = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_MSE_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src1 = AX_IVE_SRC_IMAGE_T()
+        c_src2 = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_MSE_CTRL_T()
         libaxcl_ive.AXCL_IVE_Mse.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Mse.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -499,13 +509,14 @@ def mse(src1: dict, src2: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[i
             POINTER(AX_IVE_MSE_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src1, c_src1)
-        dict_to_ax_ive_image(src2, c_src2)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_mse_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src1, c_src1)
+        dict_to_ive_image(src2, c_src2)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_Mse(byref(c_handle), byref(c_src1), byref(c_src2), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -541,12 +552,12 @@ def canny_hys_edge(src1: dict, src2: dict, dst: dict, ctrl: dict, instant: bool)
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src1 = AX_IVE_SRC_IMAGE_T()
-    c_src2 = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_HYS_EDGE_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src1 = AX_IVE_SRC_IMAGE_T()
+        c_src2 = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_HYS_EDGE_CTRL_T()
         libaxcl_ive.AXCL_IVE_CannyHysEdge.restype = AX_S32
         libaxcl_ive.AXCL_IVE_CannyHysEdge.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -556,13 +567,14 @@ def canny_hys_edge(src1: dict, src2: dict, dst: dict, ctrl: dict, instant: bool)
             POINTER(AX_IVE_HYS_EDGE_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src1, c_src1)
-        dict_to_ax_ive_image(src2, c_src2)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_hys_edge_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src1, c_src1)
+        dict_to_ive_image(src2, c_src2)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_CannyHysEdge(byref(c_handle), byref(c_src1), byref(c_src2), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -597,11 +609,11 @@ def canny_edge(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, in
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_CANNY_EDGE_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_CANNY_EDGE_CTRL_T()
         libaxcl_ive.AXCL_IVE_CannyEdge.restype = AX_S32
         libaxcl_ive.AXCL_IVE_CannyEdge.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -610,12 +622,13 @@ def canny_edge(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, in
             POINTER(AX_IVE_CANNY_EDGE_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_canny_edge_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_CannyEdge(byref(c_handle), byref(c_src), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -651,12 +664,12 @@ def ccl(src: dict, dst: dict, blob: dict, ctrl: dict, instant: bool) -> tuple[in
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_blob = AX_IVE_DST_MEM_INFO_T()
-    c_ctrl = AX_IVE_CCL_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_blob = AX_IVE_DST_MEM_INFO_T()
+        c_ctrl = AX_IVE_CCL_CTRL_T()
         libaxcl_ive.AXCL_IVE_CCL.restype = AX_S32
         libaxcl_ive.AXCL_IVE_CCL.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -666,14 +679,15 @@ def ccl(src: dict, dst: dict, blob: dict, ctrl: dict, instant: bool) -> tuple[in
             POINTER(AX_IVE_CCL_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_mem_info(blob, c_blob)
-        dict_to_ax_ive_ccl_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst, c_dst)
+        c_blob.dict2struct(blob)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_CCL(byref(c_handle), byref(c_src), byref(c_dst), byref(c_blob), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
-        ax_ive_mem_info_to_dict(c_blob, blob)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
+            blob.update(c_blob.struct2dict())
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -709,11 +723,11 @@ def erode(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
         - The input value, output value, and mask value must be 0 or 255.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_ERODE_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_ERODE_CTRL_T()
         libaxcl_ive.AXCL_IVE_Erode.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Erode.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -722,12 +736,13 @@ def erode(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
             POINTER(AX_IVE_ERODE_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_erode_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_Erode(byref(c_handle), byref(c_src), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -763,11 +778,11 @@ def dilate(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
         - The input value, output value, and mask value must be 0 or 255.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_DILATE_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_DILATE_CTRL_T()
         libaxcl_ive.AXCL_IVE_Dilate.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Dilate.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -776,12 +791,13 @@ def dilate(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
             POINTER(AX_IVE_DILATE_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_dilate_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_Dilate(byref(c_handle), byref(c_src), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -816,11 +832,11 @@ def filter(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_FILTER_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_FILTER_CTRL_T()
         libaxcl_ive.AXCL_IVE_Filter.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Filter.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -829,12 +845,13 @@ def filter(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
             POINTER(AX_IVE_FILTER_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_filter_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_Filter(byref(c_handle), byref(c_src), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -868,10 +885,10 @@ def hist(src: dict, dst: dict, instant: bool) -> tuple[int, int]:
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_MEM_INFO_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_MEM_INFO_T()
         libaxcl_ive.AXCL_IVE_Hist.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Hist.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -879,11 +896,12 @@ def hist(src: dict, dst: dict, instant: bool) -> tuple[int, int]:
             POINTER(AX_IVE_DST_MEM_INFO_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_mem_info(dst, c_dst)
+        dict_to_ive_image(src, c_src)
+        c_dst.dict2struct(dst)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_Hist(byref(c_handle), byref(c_src), byref(c_dst), c_instant)
-        ax_ive_mem_info_to_dict(c_dst, dst)
+        if ret == 0:
+            dst.update(c_dst.struct2dict())
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -918,11 +936,11 @@ def equalize_hist(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int,
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_MEM_INFO_T()
-    c_ctrl = AX_IVE_EQUALIZE_HIST_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_MEM_INFO_T()
+        c_ctrl = AX_IVE_EQUALIZE_HIST_CTRL_T()
         libaxcl_ive.AXCL_IVE_EqualizeHist.restype = AX_S32
         libaxcl_ive.AXCL_IVE_EqualizeHist.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -931,12 +949,13 @@ def equalize_hist(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int,
             POINTER(AX_IVE_EQUALIZE_HIST_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_mem_info(dst, c_dst)
-        dict_to_ax_ive_equalize_hist_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        c_dst.dict2struct(dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_EqualizeHist(byref(c_handle), byref(c_src), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_mem_info_to_dict(c_dst, dst)
+        if ret == 0:
+            dst.update(c_dst.struct2dict())
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -972,11 +991,11 @@ def integ(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
         - The pixel can be 32bit or 64 bit relied on the control parameter.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_INTEG_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_INTEG_CTRL_T()
         libaxcl_ive.AXCL_IVE_Integ.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Integ.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -985,12 +1004,13 @@ def integ(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
             POINTER(AX_IVE_INTEG_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_integ_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_Integ(byref(c_handle), byref(c_src), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1027,12 +1047,12 @@ def mag_and_ang(src1: dict, src2: dict, dst_mag: dict, dst_ang: dict, instant: b
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src1 = AX_IVE_SRC_IMAGE_T()
-    c_src2 = AX_IVE_SRC_IMAGE_T()
-    c_dst_mag = AX_IVE_DST_IMAGE_T()
-    c_dst_ang = AX_IVE_DST_IMAGE_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src1 = AX_IVE_SRC_IMAGE_T()
+        c_src2 = AX_IVE_SRC_IMAGE_T()
+        c_dst_mag = AX_IVE_DST_IMAGE_T()
+        c_dst_ang = AX_IVE_DST_IMAGE_T()
         libaxcl_ive.AXCL_IVE_MagAndAng.restype = AX_S32
         libaxcl_ive.AXCL_IVE_MagAndAng.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1042,14 +1062,15 @@ def mag_and_ang(src1: dict, src2: dict, dst_mag: dict, dst_ang: dict, instant: b
             POINTER(AX_IVE_DST_IMAGE_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src1, c_src1)
-        dict_to_ax_ive_image(src2, c_src2)
-        dict_to_ax_ive_image(dst_mag, c_dst_mag)
-        dict_to_ax_ive_image(dst_ang, c_dst_ang)
+        dict_to_ive_image(src1, c_src1)
+        dict_to_ive_image(src2, c_src2)
+        dict_to_ive_image(dst_mag, c_dst_mag)
+        dict_to_ive_image(dst_ang, c_dst_ang)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_MagAndAng(byref(c_handle), byref(c_src1), byref(c_src2), byref(c_dst_mag), byref(c_dst_ang), c_instant)
-        ax_ive_image_to_dict(c_dst_mag, dst_mag)
-        ax_ive_image_to_dict(c_dst_ang, dst_ang)
+        if ret == 0:
+            ive_image_to_dict(c_dst_mag, dst_mag)
+            ive_image_to_dict(c_dst_ang, dst_ang)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1084,11 +1105,11 @@ def sobel(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_SOBEL_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_SOBEL_CTRL_T()
         libaxcl_ive.AXCL_IVE_Sobel.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Sobel.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1097,12 +1118,13 @@ def sobel(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
             POINTER(AX_IVE_SOBEL_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_sobel_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_Sobel(byref(c_handle), byref(c_src), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1139,13 +1161,13 @@ def gmm(src: dict, dst_fg: dict, dst_bg: dict, model: dict, ctrl: dict, instant:
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst_fg = AX_IVE_DST_IMAGE_T()
-    c_dst_bg = AX_IVE_DST_IMAGE_T()
-    c_model = AX_IVE_MEM_INFO_T()
-    c_ctrl = AX_IVE_GMM_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst_fg = AX_IVE_DST_IMAGE_T()
+        c_dst_bg = AX_IVE_DST_IMAGE_T()
+        c_model = AX_IVE_MEM_INFO_T()
+        c_ctrl = AX_IVE_GMM_CTRL_T()
         libaxcl_ive.AXCL_IVE_GMM.restype = AX_S32
         libaxcl_ive.AXCL_IVE_GMM.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1156,15 +1178,16 @@ def gmm(src: dict, dst_fg: dict, dst_bg: dict, model: dict, ctrl: dict, instant:
             POINTER(AX_IVE_GMM_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst_fg, c_dst_fg)
-        dict_to_ax_ive_image(dst_bg, c_dst_bg)
-        dict_to_ax_ive_mem_info(model, c_model)
-        dict_to_ax_ive_gmm_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst_fg, c_dst_fg)
+        dict_to_ive_image(dst_bg, c_dst_bg)
+        c_model.dict2struct(model)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_GMM(byref(c_handle), byref(c_src), byref(c_dst_fg), byref(c_dst_bg), byref(c_model), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst_fg, dst_fg)
-        ax_ive_image_to_dict(c_dst_bg, dst_bg)
+        if ret == 0:
+            ive_image_to_dict(c_dst_fg, dst_fg)
+            ive_image_to_dict(c_dst_bg, dst_bg)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1201,13 +1224,13 @@ def gmm2(src: dict, dst_fg: dict, dst_bg: dict, model: dict, ctrl: dict, instant
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst_fg = AX_IVE_DST_IMAGE_T()
-    c_dst_bg = AX_IVE_DST_IMAGE_T()
-    c_model = AX_IVE_MEM_INFO_T()
-    c_ctrl = AX_IVE_GMM2_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst_fg = AX_IVE_DST_IMAGE_T()
+        c_dst_bg = AX_IVE_DST_IMAGE_T()
+        c_model = AX_IVE_MEM_INFO_T()
+        c_ctrl = AX_IVE_GMM2_CTRL_T()
         libaxcl_ive.AXCL_IVE_GMM2.restype = AX_S32
         libaxcl_ive.AXCL_IVE_GMM2.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1218,15 +1241,16 @@ def gmm2(src: dict, dst_fg: dict, dst_bg: dict, model: dict, ctrl: dict, instant
             POINTER(AX_IVE_GMM2_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst_fg, c_dst_fg)
-        dict_to_ax_ive_image(dst_bg, c_dst_bg)
-        dict_to_ax_ive_mem_info(model, c_model)
-        dict_to_ax_ive_gmm2_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst_fg, c_dst_fg)
+        dict_to_ive_image(dst_bg, c_dst_bg)
+        c_model.dict2struct(model)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_GMM2(byref(c_handle), byref(c_src), byref(c_dst_fg), byref(c_dst_bg), byref(c_model), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst_fg, dst_fg)
-        ax_ive_image_to_dict(c_dst_bg, dst_bg)
+        if ret == 0:
+            ive_image_to_dict(c_dst_fg, dst_fg)
+            ive_image_to_dict(c_dst_bg, dst_bg)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1261,11 +1285,11 @@ def thresh(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_THRESH_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_THRESH_CTRL_T()
         libaxcl_ive.AXCL_IVE_Thresh.restype = AX_S32
         libaxcl_ive.AXCL_IVE_Thresh.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1274,12 +1298,13 @@ def thresh(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[int, int]:
             POINTER(AX_IVE_THRESH_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_thresh_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_Thresh(byref(c_handle), byref(c_src), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1314,11 +1339,11 @@ def ive_16bit_to_8bit(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_DST_IMAGE_T()
-    c_ctrl = AX_IVE_16BIT_TO_8BIT_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_DST_IMAGE_T()
+        c_ctrl = AX_IVE_16BIT_TO_8BIT_CTRL_T()
         libaxcl_ive.AXCL_IVE_16BitTo8Bit.restype = AX_S32
         libaxcl_ive.AXCL_IVE_16BitTo8Bit.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1327,12 +1352,13 @@ def ive_16bit_to_8bit(src: dict, dst: dict, ctrl: dict, instant: bool) -> tuple[
             POINTER(AX_IVE_16BIT_TO_8BIT_CTRL_T),
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst, c_dst)
-        dict_to_ax_ive_16bit_to_8bit_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst, c_dst)
+        c_ctrl.dict2struct(ctrl)
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_16BitTo8Bit(byref(c_handle), byref(c_src), byref(c_dst), byref(c_ctrl), c_instant)
-        ax_ive_image_to_dict(c_dst, dst)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1369,12 +1395,15 @@ def crop_image(src: dict, dst_list: list[dict], box_list: list[dict], ctrl: dict
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst_list))()
-    c_box = (POINTER(AX_IVE_RECT_U16_T) * len(box_list))()
-    c_ctrl = AX_IVE_CROP_IMAGE_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst_list))()
+        c_dst_array = (AX_IVE_DST_IMAGE_T * len(dst_list))()
+        c_box = (POINTER(AX_IVE_RECT_U16_T) * len(box_list))()
+        c_box_array = (AX_IVE_RECT_U16_T*len(box_list))()
+        c_ctrl = AX_IVE_CROP_IMAGE_CTRL_T()
+
         libaxcl_ive.AXCL_IVE_CropImage.restype = AX_S32
         libaxcl_ive.AXCL_IVE_CropImage.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1385,14 +1414,20 @@ def crop_image(src: dict, dst_list: list[dict], box_list: list[dict], ctrl: dict
             AX_IVE_ENGINE_E,
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_images(dst_list, c_dst)
-        dict_to_ax_ive_rects(box_list, c_box)
-        dict_to_ax_ive_crop_image_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src, c_src)
+        for idx, d_item in enumerate(dst_list):
+            c_dst[idx] = cast(addressof(c_dst_array[idx]), POINTER(AX_IVE_DST_IMAGE_T))
+            dict_to_ive_image(d_item, c_dst_array[idx])
+        for idx, d_item in enumerate(box_list):
+            c_box[idx] = cast(addressof(c_box_array[idx]), POINTER(AX_IVE_RECT_U16_T))
+            c_box_array[idx].dict2struct(d_item)
+        c_ctrl.dict2struct(ctrl)
         c_engine = engine
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_CropImage(byref(c_handle), byref(c_src), c_dst, c_box, byref(c_ctrl), c_engine, c_instant)
-        ax_ive_images_to_dict(c_dst, dst_list, engine)
+        if ret == 0:
+            for idx, d_item in enumerate(dst_list):
+                ive_image_to_dict(c_dst_array[idx], d_item)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1429,12 +1464,19 @@ def crop_resize(src: dict, dst_list: list[dict], box_list: list[dict], ctrl: dic
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst_list))()
-    c_box = (POINTER(AX_IVE_RECT_U16_T) * len(box_list))()
-    c_ctrl = AX_IVE_CROP_RESIZE_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+
+        c_src = AX_IVE_SRC_IMAGE_T()
+
+        c_dst = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst_list))()
+        c_dst_array = (AX_IVE_DST_IMAGE_T * len(dst_list))()
+
+        c_box = (POINTER(AX_IVE_RECT_U16_T) * len(box_list))()
+        c_box_array = (AX_IVE_RECT_U16_T * len(box_list))()
+
+        c_ctrl = AX_IVE_CROP_RESIZE_CTRL_T()
+
         libaxcl_ive.AXCL_IVE_CropResize.restype = AX_S32
         libaxcl_ive.AXCL_IVE_CropResize.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1445,14 +1487,21 @@ def crop_resize(src: dict, dst_list: list[dict], box_list: list[dict], ctrl: dic
             AX_IVE_ENGINE_E,
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_images(dst_list, c_dst)
-        dict_to_ax_ive_rects(box_list, c_box)
-        dict_to_ax_ive_crop_resize_ctrl(ctrl, c_ctrl)
+
+        dict_to_ive_image(src, c_src)
+        for idx, d_item in enumerate(dst_list):
+            c_dst[idx] = cast(addressof(c_dst_array[idx]), POINTER(AX_IVE_DST_IMAGE_T))
+            dict_to_ive_image(d_item, c_dst_array[idx])
+        for idx, d_item in enumerate(box_list):
+            c_box[idx] = cast(addressof(c_box_array[idx]), POINTER(AX_IVE_RECT_U16_T))
+            c_box_array[idx].dict2struct(d_item)
+        c_ctrl.dict2struct(ctrl)
         c_engine = engine
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_CropResize(byref(c_handle), byref(c_src), c_dst, c_box, byref(c_ctrl), c_engine, c_instant)
-        ax_ive_images_to_dict(c_dst, dst_list, engine)
+        if ret == 0:
+            for idx, d_item in enumerate(dst_list):
+                ive_image_to_dict(c_dst_array[idx], d_item, engine)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1491,14 +1540,18 @@ def crop_resize_for_split_yuv(src1: dict, src2: dict, dst1_list: list[dict], dst
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src1 = AX_IVE_SRC_IMAGE_T()
-    c_src2 = AX_IVE_SRC_IMAGE_T()
-    c_dst1 = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst1_list))()
-    c_dst2 = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst2_list))()
-    c_box = (POINTER(AX_IVE_RECT_U16_T) * len(box_list))()
-    c_ctrl = AX_IVE_CROP_RESIZE_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src1 = AX_IVE_SRC_IMAGE_T()
+        c_src2 = AX_IVE_SRC_IMAGE_T()
+        c_dst1 = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst1_list))()
+        c_dst1_array = (AX_IVE_DST_IMAGE_T * len(dst1_list))()
+        c_dst2 = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst2_list))()
+        c_dst2_array = (AX_IVE_DST_IMAGE_T * len(dst2_list))()
+        c_box = (POINTER(AX_IVE_RECT_U16_T) * len(box_list))()
+        c_box_array = (AX_IVE_RECT_U16_T * len(box_list))()
+        c_ctrl = AX_IVE_CROP_RESIZE_CTRL_T()
+
         libaxcl_ive.AXCL_IVE_CropResizeForSplitYUV.restype = AX_S32
         libaxcl_ive.AXCL_IVE_CropResizeForSplitYUV.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1511,17 +1564,26 @@ def crop_resize_for_split_yuv(src1: dict, src2: dict, dst1_list: list[dict], dst
             AX_IVE_ENGINE_E,
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src1, c_src1)
-        dict_to_ax_ive_image(src2, c_src2)
-        dict_to_ax_ive_images(dst1_list, c_dst1)
-        dict_to_ax_ive_images(dst2_list, c_dst2)
-        dict_to_ax_ive_rects(box_list, c_box)
-        dict_to_ax_ive_crop_resize_ctrl(ctrl, c_ctrl)
+        dict_to_ive_image(src1, c_src1)
+        dict_to_ive_image(src2, c_src2)
+        for idx, d_item in enumerate(dst1_list):
+            c_dst1[idx] = cast(addressof(c_dst1_array[idx]), POINTER(AX_IVE_DST_IMAGE_T))
+            dict_to_ive_image(d_item, c_dst1_array[idx])
+        for idx, d_item in enumerate(dst2_list):
+            c_dst2[idx] = cast(addressof(c_dst2_array[idx]), POINTER(AX_IVE_DST_IMAGE_T))
+            dict_to_ive_image(d_item, c_dst2_array[idx])
+        for idx, d_item in enumerate(box_list):
+            c_box[idx] = cast(addressof(c_box_array[idx]), POINTER(AX_IVE_RECT_U16_T))
+            c_box_array[idx].dict2struct(d_item)
+        c_ctrl.dict2struct(ctrl)
         c_engine = engine
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_CropResizeForSplitYUV(byref(c_handle), byref(c_src1), byref(c_src2), c_dst1, c_dst2, c_box, byref(c_ctrl), c_engine, c_instant)
-        ax_ive_images_to_dict(c_dst1, dst1_list, engine)
-        ax_ive_images_to_dict(c_dst2, dst2_list, engine)
+        if ret == 0:
+            for idx, d_item in enumerate(dst1_list):
+                ive_image_to_dict(c_dst1_array[idx], d_item, engine)
+            for idx, d_item in enumerate(dst2_list):
+                ive_image_to_dict(c_dst2_array[idx], d_item, engine)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1556,10 +1618,10 @@ def csc(src: dict, dst: dict, engine: int, instant: bool) -> tuple[int, int]:
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = AX_IVE_SRC_IMAGE_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = AX_IVE_SRC_IMAGE_T()
         libaxcl_ive.AXCL_IVE_CSC.restype = AX_S32
         libaxcl_ive.AXCL_IVE_CSC.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1568,12 +1630,13 @@ def csc(src: dict, dst: dict, engine: int, instant: bool) -> tuple[int, int]:
             AX_IVE_ENGINE_E,
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_image(dst, c_dst)
+        dict_to_ive_image(src, c_src)
+        dict_to_ive_image(dst, c_dst)
         c_engine = engine
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_CSC(byref(c_handle), byref(c_src), byref(c_dst), c_engine, c_instant)
-        ax_ive_image_to_dict(c_dst, dst, engine)
+        if ret == 0:
+            ive_image_to_dict(c_dst, dst, engine)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1611,13 +1674,17 @@ def crop_resize2(src: dict, dst_list: list[dict], src_box_list: list[dict], dst_
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_SRC_IMAGE_T()
-    c_dst = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst_list))()
-    c_src_box = (POINTER(AX_IVE_RECT_U16_T) * len(src_box_list))()
-    c_dst_box = (POINTER(AX_IVE_RECT_U16_T) * len(dst_box_list))()
-    c_ctrl = AX_IVE_CROP_IMAGE_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_SRC_IMAGE_T()
+        c_dst = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst_list))()
+        c_dst_array = (AX_IVE_DST_IMAGE_T * len(dst_list))()
+        c_src_box = (POINTER(AX_IVE_RECT_U16_T) * len(src_box_list))()
+        c_src_box_array = (AX_IVE_RECT_U16_T * len(src_box_list))()
+        c_dst_box = (POINTER(AX_IVE_RECT_U16_T) * len(dst_box_list))()
+        c_dst_box_array = (AX_IVE_RECT_U16_T * len(dst_box_list))()
+        c_ctrl = AX_IVE_CROP_IMAGE_CTRL_T()
+
         libaxcl_ive.AXCL_IVE_CropResize2.restype = AX_S32
         libaxcl_ive.AXCL_IVE_CropResize2.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1629,15 +1696,25 @@ def crop_resize2(src: dict, dst_list: list[dict], src_box_list: list[dict], dst_
             AX_IVE_ENGINE_E,
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src, c_src)
-        dict_to_ax_ive_images(dst_list, c_dst)
-        dict_to_ax_ive_rects(src_box_list, c_src_box)
-        dict_to_ax_ive_rects(dst_box_list, c_dst_box)
-        dict_to_ax_ive_crop_image_ctrl(ctrl, c_ctrl)
+
+        dict_to_ive_image(src, c_src)
+        for idx, d_item in enumerate(dst_list):
+            c_dst[idx] = cast(addressof(c_dst_array[idx]), POINTER(AX_IVE_DST_IMAGE_T))
+            dict_to_ive_image(d_item, c_dst_array[idx])
+        for idx, d_item in enumerate(src_box_list):
+            c_src_box[idx] = cast(addressof(c_src_box_array[idx]), POINTER(AX_IVE_RECT_U16_T))
+            c_src_box_array[idx].dict2struct(d_item)
+        for idx, d_item in enumerate(dst_box_list):
+            c_dst_box[idx] = cast(addressof(c_dst_box_array[idx]), POINTER(AX_IVE_RECT_U16_T))
+            c_dst_box_array[idx].dict2struct(d_item)
+        c_ctrl.dict2struct(ctrl)
         c_engine = engine
         c_instant = AX_BOOL(1 if instant else 0)
+
         ret = libaxcl_ive.AXCL_IVE_CropResize2(byref(c_handle), byref(c_src), c_dst, c_src_box, c_dst_box, byref(c_ctrl), c_engine, c_instant)
-        ax_ive_images_to_dict(c_dst, dst_list, engine)
+        if ret == 0:
+            for idx, d_item in enumerate(dst_list):
+                ive_image_to_dict(c_dst_array[idx], d_item, engine)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1677,15 +1754,20 @@ def crop_resize2_for_split_yuv(src1: dict, src2: dict, dst1_list: list[dict], ds
         - The stride must be 16-pixel-aligned.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src1 = AX_IVE_SRC_IMAGE_T()
-    c_src2 = AX_IVE_SRC_IMAGE_T()
-    c_dst1 = (POINTER(AX_IVE_IMAGE_T) * len(dst1_list))()
-    c_dst2 = (POINTER(AX_IVE_IMAGE_T) * len(dst2_list))()
-    c_src_box = (POINTER(AX_IVE_RECT_U16_T) * len(src_box_list))()
-    c_dst_box = (POINTER(AX_IVE_RECT_U16_T) * len(dst_box_list))()
-    c_ctrl = AX_IVE_CROP_IMAGE_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src1 = AX_IVE_SRC_IMAGE_T()
+        c_src2 = AX_IVE_SRC_IMAGE_T()
+        c_dst1 = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst1_list))()
+        c_dst1_array = (AX_IVE_DST_IMAGE_T * len(dst1_list))()
+        c_dst2 = (POINTER(AX_IVE_DST_IMAGE_T) * len(dst2_list))()
+        c_dst2_array = (AX_IVE_DST_IMAGE_T * len(dst2_list))()
+        c_src_box = (POINTER(AX_IVE_RECT_U16_T) * len(src_box_list))()
+        c_src_box_array = (AX_IVE_RECT_U16_T * len(src_box_list))()
+        c_dst_box = (POINTER(AX_IVE_RECT_U16_T) * len(dst_box_list))()
+        c_dst_box_array = (AX_IVE_RECT_U16_T * len(dst_box_list))()
+        c_ctrl = AX_IVE_CROP_IMAGE_CTRL_T()
+
         libaxcl_ive.AXCL_IVE_CropResize2ForSplitYUV.restype = AX_S32
         libaxcl_ive.AXCL_IVE_CropResize2ForSplitYUV.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1699,18 +1781,30 @@ def crop_resize2_for_split_yuv(src1: dict, src2: dict, dst1_list: list[dict], ds
             AX_IVE_ENGINE_E,
             AX_BOOL
         ]
-        dict_to_ax_ive_image(src1, c_src1)
-        dict_to_ax_ive_image(src2, c_src2)
-        dict_to_ax_ive_images(dst1_list, c_dst1)
-        dict_to_ax_ive_images(dst2_list, c_dst2)
-        dict_to_ax_ive_rects(src_box_list, c_src_box)
-        dict_to_ax_ive_rects(dst_box_list, c_dst_box)
-        dict_to_ax_ive_crop_image_ctrl(ctrl, c_ctrl)
+
+        dict_to_ive_image(src1, c_src1)
+        dict_to_ive_image(src2, c_src2)
+        for idx, d_item in enumerate(dst1_list):
+            c_dst1[idx] = cast(addressof(c_dst1_array[idx]), POINTER(AX_IVE_DST_IMAGE_T))
+            dict_to_ive_image(d_item, c_dst1_array[idx])
+        for idx, d_item in enumerate(dst2_list):
+            c_dst2[idx] = cast(addressof(c_dst2_array[idx]), POINTER(AX_IVE_DST_IMAGE_T))
+            dict_to_ive_image(d_item, c_dst2_array[idx])
+        for idx, d_item in enumerate(src_box_list):
+            c_src_box[idx] = cast(addressof(c_src_box_array[idx]), POINTER(AX_IVE_RECT_U16_T))
+            c_src_box_array[idx].dict2struct(d_item)
+        for idx, d_item in enumerate(dst_box_list):
+            c_dst_box[idx] = cast(addressof(c_dst_box_array[idx]), POINTER(AX_IVE_RECT_U16_T))
+            c_dst_box_array[idx].dict2struct(d_item)
+        c_ctrl.dict2struct(ctrl)
         c_engine = engine
         c_instant = AX_BOOL(1 if instant else 0)
         ret = libaxcl_ive.AXCL_IVE_CropResize2ForSplitYUV(byref(c_handle), byref(c_src1), byref(c_src2), c_dst1, c_dst2, c_src_box, c_dst_box, byref(c_ctrl), c_engine, c_instant)
-        ax_ive_images_to_dict(c_dst1, dst1_list, engine)
-        ax_ive_images_to_dict(c_dst2, dst2_list, engine)
+        if ret == 0:
+            for idx, d_item in enumerate(dst1_list):
+                ive_image_to_dict(c_dst1_array[idx], d_item, engine)
+            for idx, d_item in enumerate(dst2_list):
+                ive_image_to_dict(c_dst2_array[idx], d_item, engine)
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1742,11 +1836,11 @@ def mau_matmul(src: dict, dst: dict, ctrl: dict, engine: int, instant: bool) -> 
         - **ret** (*int*) - 0 indicates success, otherwise failure.
     """
     ret = -1
-    c_handle = AX_IVE_HANDLE(-1)
-    c_src = AX_IVE_MAU_MATMUL_INPUT_T()
-    c_dst = AX_IVE_MAU_MATMUL_OUTPUT_T()
-    c_ctrl = AX_IVE_MAU_MATMUL_CTRL_T()
     try:
+        c_handle = AX_IVE_HANDLE(-1)
+        c_src = AX_IVE_MAU_MATMUL_INPUT_T()
+        c_dst = AX_IVE_MAU_MATMUL_OUTPUT_T()
+        c_ctrl = AX_IVE_MAU_MATMUL_CTRL_T()
         libaxcl_ive.AXCL_IVE_MAU_MatMul.restype = AX_S32
         libaxcl_ive.AXCL_IVE_MAU_MatMul.argtypes = [
             POINTER(AX_IVE_HANDLE),
@@ -1756,13 +1850,16 @@ def mau_matmul(src: dict, dst: dict, ctrl: dict, engine: int, instant: bool) -> 
             AX_IVE_ENGINE_E,
             AX_BOOL
         ]
-        dict_to_ax_ive_mau_matmul_input(src, c_src)
-        dict_to_ax_ive_mau_matmul_output(dst, c_dst)
-        dict_to_ax_ive_mau_matmul_ctrl(ctrl, c_ctrl)
+
+        c_src.dict2struct(src)
+        c_dst.dict2struct(dst)
+        c_ctrl.dict2struct(ctrl)
+
         c_engine = engine
-        c_instant = AX_BOOL(1 if instant else 0)
+        c_instant = AX_BOOL(instant)
         ret = libaxcl_ive.AXCL_IVE_MAU_MatMul(byref(c_handle), byref(c_src), byref(c_dst), byref(c_ctrl), c_engine, c_instant)
-        ax_ive_mau_matmul_output_to_dict(c_dst, dst)
+        if ret == 0:
+            dst.update(c_dst.struct2dict())
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())
@@ -1790,15 +1887,16 @@ def npu_create_matmul_handle(ctrl: dict) -> tuple[int, int]:
         - **ret** (*int*) - 0 indicates success, otherwise failure.
     """
     ret = -1
-    c_handle = AX_IVE_MATMUL_HANDLE(-1)
-    c_ctrl = AX_IVE_NPU_MATMUL_CTRL_T()
     try:
+        c_handle = AX_IVE_MATMUL_HANDLE(-1)
+        c_ctrl = AX_IVE_NPU_MATMUL_CTRL_T()
         libaxcl_ive.AXCL_IVE_NPU_CreateMatMulHandle.restype = AX_S32
         libaxcl_ive.AXCL_IVE_NPU_CreateMatMulHandle.argtypes = [
             POINTER(AX_IVE_MATMUL_HANDLE),
             POINTER(AX_IVE_NPU_MATMUL_CTRL_T)
         ]
-        dict_to_ax_ive_npu_matmul_ctrl(ctrl, c_ctrl)
+        c_ctrl.dict2struct(ctrl)
+
         ret = libaxcl_ive.AXCL_IVE_NPU_CreateMatMulHandle(byref(c_handle), byref(c_ctrl))
     except:
         log_error(sys.exc_info())
@@ -1863,9 +1961,9 @@ def npu_matmul(handle: int, src: dict, dst: dict, engine: int, instant: bool) ->
         - **ret** (*int*) - 0 indicates success, otherwise failure.
     """
     ret = -1
-    c_src = AX_IVE_MAU_MATMUL_INPUT_T()
-    c_dst = AX_IVE_MAU_MATMUL_OUTPUT_T()
     try:
+        c_src = AX_IVE_MAU_MATMUL_INPUT_T()
+        c_dst = AX_IVE_MAU_MATMUL_OUTPUT_T()
         libaxcl_ive.AXCL_IVE_NPU_MatMul.restype = AX_S32
         libaxcl_ive.AXCL_IVE_NPU_MatMul.argtypes = [
             POINTER(AX_IVE_MATMUL_HANDLE),
@@ -1875,12 +1973,15 @@ def npu_matmul(handle: int, src: dict, dst: dict, engine: int, instant: bool) ->
             AX_BOOL
         ]
         c_handle = handle
-        dict_to_ax_ive_mau_matmul_input(src, c_src)
-        dict_to_ax_ive_mau_matmul_output(dst, c_dst)
+
+        c_src.dict2struct(src)
+        c_dst.dict2struct(dst)
+
         c_engine = engine
-        c_instant = AX_BOOL(1 if instant else 0)
+        c_instant = AX_BOOL(instant)
         ret = libaxcl_ive.AXCL_IVE_NPU_MatMul(byref(c_handle), byref(c_src), byref(c_dst), c_engine, c_instant)
-        ax_ive_mau_matmul_output_to_dict(c_dst, dst)
+
+        dst.update(c_dst.struct2dict())
     except:
         log_error(sys.exc_info())
         log_error(traceback.format_exc())

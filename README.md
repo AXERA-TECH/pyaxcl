@@ -34,7 +34,7 @@ Python >= 3.9 64bit
 
 2.  编译wheel包并安装
 
-   - 编译：`./build.sh`生成的wheel路径：***out**/pyAXCL-x.yy.z-py3-none-any.whl*
+   - 编译：`./build.sh`生成的wheel路径：***dist**/pyAXCL-x.yy.z-py3-none-any.whl*
 
    - 安装：
 
@@ -56,6 +56,10 @@ Python >= 3.9 64bit
      ```python
      $ pip3 uninstall pyAXCL -y
      ```
+
+> [!NOTE]
+>
+> [直接下载wheel包](https://github.com/AXERA-TECH/pyaxcl/releases)
 
 
 

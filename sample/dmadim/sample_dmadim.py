@@ -24,6 +24,7 @@ from axclite.axclite_device import AxcliteDevice
 from axclite.axclite_system import axclite_system
 from axclite.axclite_file import *
 from axclite.axclite_memory import *
+from axclite.axclite_utils import *
 
 
 def _init():
@@ -97,8 +98,8 @@ def dma_copy2d(src_file, dst_path, width, height):
         return
 
     # Y
-    dst_width = width // 2
-    dst_height = height // 2
+    dst_width = axclite_align_down(width // 2, 2)
+    dst_height = axclite_align_down(height // 2, 2)
     dst_y_size = dst_width * dst_height
     dst_y_dev_mem_object = AxcliteDeviceMalloc(dst_y_size)
     dst_y_dev_mem = dst_y_dev_mem_object.address

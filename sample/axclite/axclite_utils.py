@@ -20,6 +20,10 @@ def axclite_align_up(x, align):
     return (x + (align - 1)) & ~(align - 1)
 
 
+def axclite_align_down(x, align):
+    return x & ~(align - 1)
+
+
 def axclite_memcmp(s1: ctypes.c_void_p, s2: ctypes.c_void_p, n: ctypes.c_size_t) -> int:
     try:
         libc = ctypes.CDLL(None)

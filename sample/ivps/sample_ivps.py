@@ -91,8 +91,8 @@ def crop_resize_test(src_file, dst_path, width, height, src_type, dst_type, engi
     if src_dev_mem == 0:
         return
 
-    dst_width = width//2
-    dst_height = height//2
+    dst_width = axclite_align_down(width//2, 2)
+    dst_height = axclite_align_down(height//2, 2)
     dst_stride = axclite_get_stride(dst_width, dst_type)
     dst_size = axclite_get_image_size(dst_stride, dst_height, dst_type)
     dst_dev_mem_object = AxcliteDeviceMalloc(dst_size)
@@ -108,10 +108,10 @@ def crop_resize_test(src_file, dst_path, width, height, src_type, dst_type, engi
         'pic_stride': [src_stride, src_stride, 0],
         'phy_addr': [src_dev_mem, 0, 0],
         'vir_addr': [0],
-        'crop_x': width//4,
-        'crop_y': height//4,
-        'crop_width': width//2,
-        'crop_height': height//2,
+        'crop_x': axclite_align_down(width//4, 2),
+        'crop_y': axclite_align_down(height//4, 2),
+        'crop_width': axclite_align_down(width//2, 2),
+        'crop_height': axclite_align_down(height//2, 2),
         'frame_size': src_size
     }
 
@@ -163,8 +163,8 @@ def crop_resize_v2_test(src_file, dst_path, width, height, src_type, dst_type, e
     if src_dev_mem == 0:
         return
 
-    dst_width = width//2
-    dst_height = height//2
+    dst_width = axclite_align_down(width//2, 2)
+    dst_height = axclite_align_down(height//2, 2)
     dst_stride = axclite_get_stride(dst_width, dst_type)
     dst_size = axclite_get_image_size(dst_stride, dst_height, dst_type)
     dst1_dev_mem_object = AxcliteDeviceMalloc(dst_size)
@@ -188,14 +188,14 @@ def crop_resize_v2_test(src_file, dst_path, width, height, src_type, dst_type, e
 
     box_list = [
         {
-            'x': width//8,
-            'y': height//8,
-            'width': dst_width//2,
-            'height': dst_height//2
+            'x': axclite_align_down(width//8, 2),
+            'y': axclite_align_down(height//8, 2),
+            'width': axclite_align_down(dst_width//2, 2),
+            'height': axclite_align_down(dst_height//2, 2)
         },
         {
-            'x': width//4,
-            'y': width//4,
+            'x': axclite_align_down(width//4, 2),
+            'y': axclite_align_down(width//4, 2),
             'width': dst_width,
             'height': dst_height
         }
@@ -271,8 +271,8 @@ def crop_resize_v3_test(src_file, dst_path, width, height, src_type, dst_type, e
     dst1_dev_mem_object = AxcliteDeviceMalloc(dst1_size)
     dst1_dev_mem = dst1_dev_mem_object.address
 
-    dst2_width = width//2
-    dst2_height = height//2
+    dst2_width = axclite_align_down(width//2, 2)
+    dst2_height = axclite_align_down(height//2, 2)
     dst2_stride = axclite_get_stride(dst2_width, dst_type)
     dst2_size = axclite_get_image_size(dst2_stride, dst2_height, dst_type)
     dst2_dev_mem_object = AxcliteDeviceMalloc(dst2_size)
@@ -288,10 +288,10 @@ def crop_resize_v3_test(src_file, dst_path, width, height, src_type, dst_type, e
         'pic_stride': [src_stride, src_stride, 0],
         'phy_addr': [src_dev_mem, 0, 0],
         'vir_addr': [0],
-        'crop_x': width//4,
-        'crop_y': height//4,
-        'crop_width': width//2,
-        'crop_height': height//2,
+        'crop_x': axclite_align_down(width//4, 2),
+        'crop_y': axclite_align_down(height//4, 2),
+        'crop_width': axclite_align_down(width//2, 2),
+        'crop_height': axclite_align_down(height//2, 2),
         'frame_size': src_size
     }
 
@@ -354,8 +354,8 @@ def crop_resize_v4_test(src_file, dst_path, width, height, src_type, dst_type, e
     if src_dev_mem == 0:
         return
 
-    dst_width = width//2
-    dst_height = height//2
+    dst_width = axclite_align_down(width//2, 2)
+    dst_height = axclite_align_down(height//2, 2)
     dst_stride = axclite_get_stride(dst_width, dst_type)
     dst_size = axclite_get_image_size(dst_stride, dst_height, dst_type)
     dst_dev_mem_object = AxcliteDeviceMalloc(dst_size)
@@ -371,10 +371,10 @@ def crop_resize_v4_test(src_file, dst_path, width, height, src_type, dst_type, e
         'pic_stride': [src_stride, src_stride, 0],
         'phy_addr': [src_dev_mem, 0, 0],
         'vir_addr': [0],
-        'crop_x': width//4,
-        'crop_y': height//4,
-        'crop_width': width//2,
-        'crop_height': height//2,
+        'crop_x': axclite_align_down(width//4, 2),
+        'crop_y': axclite_align_down(height//4, 2),
+        'crop_width': axclite_align_down(width//2, 2),
+        'crop_height': axclite_align_down(height//2, 2),
         'frame_size': src_size
     }
 
